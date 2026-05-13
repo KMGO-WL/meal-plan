@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karim's Meal Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --card: #1a1a1a;
+    --card2: #202020;
+    --border: #2a2a2a;
+    --text: #f0ece4;
+    --muted: #777;
+    --mod: #e8c547;
+    --low: #5bc8a8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; padding: 20px 14px 80px; }
+
+  header { text-align: center; padding: 36px 0 28px; }
+  header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 11vw, 76px); letter-spacing: 5px; line-height: 1; }
+  header p { color: var(--muted); font-size: 12px; margin-top: 6px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ---- TOP TABS ---- */
+  .top-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  .top-tab { padding: 10px 26px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
+  .top-tab.t-mod { background: var(--mod); border-color: var(--mod); color: #000; }
+  .top-tab.t-low { background: var(--low); border-color: var(--low); color: #000; }
+
+  /* ---- SUB TABS ---- */
+  .sub-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 28px; }
+  .sub-tab { padding: 7px 20px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s; }
+  .sub-tab.s-active-mod { background: #2e2600; border-color: var(--mod); color: var(--mod); }
+  .sub-tab.s-active-low { background: #00231a; border-color: var(--low); color: var(--low); }
+
+  .section { display: none; max-width: 680px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* ---- GROCERY BANNER ---- */
+  .grocery-banner { background: #161616; border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 24px; }
+  .grocery-banner h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .grocery-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grocery-col h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
+  .grocery-item { font-size: 13px; padding: 6px 0; border-bottom: 1px solid #1e1e1e; display: flex; align-items: center; gap: 7px; line-height: 1.3; }
+  .grocery-item:last-child { border-bottom: none; }
+  .g-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .g-mod { background: var(--mod); }
+  .g-low { background: var(--low); }
+  .g-both { background: #888; }
+
+  /* ---- MACRO BAR ---- */
+  .macro-bar { display: flex; gap: 10px; margin-bottom: 10px; }
+  .macro-pill { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 8px; text-align: center; }
+  .macro-pill .val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; }
+  .macro-pill .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-top: 2px; }
+  .cals-tag { text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 22px; }
+
+  /* ---- MEALS ---- */
+  .meal { background: var(--card); border: 1px solid var(--border); border-radius: 18px; margin-bottom: 12px; overflow: hidden; }
+  .meal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .meal-header-left { display: flex; align-items: center; gap: 12px; }
+  .meal-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+  .meal-title { font-weight: 600; font-size: 14px; }
+  .meal-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .meal-cals { font-family: 'Bebas Neue', sans-serif; font-size: 20px; }
+
+  .meal-body { padding: 14px 18px; }
+  .food-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid #1e1e1e; gap: 10px; }
+  .food-item:last-child { border-bottom: none; }
+  .food-name { font-size: 13px; font-weight: 500; }
+  .food-portion { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .food-macros { display: flex; gap: 5px; text-align: center; flex-shrink: 0; }
+  .fm { font-size: 11px; padding: 3px 6px; border-radius: 6px; background: #252525; min-width: 34px; }
+  .fm span { display: block; font-size: 9px; color: var(--muted); }
+
+  /* ---- TOTALS ---- */
+  .totals-row { background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+  .totals-row .t-label { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--muted); }
+  .totals-nums { display: flex; gap: 14px; }
+  .tn { text-align: center; }
+  .tn .v { font-family: 'Bebas Neue', sans-serif; font-size: 18px; }
+  .tn .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .note { background: #161616; border: 1px solid #222; border-radius: 12px; padding: 12px 16px; font-size: 11px; color: var(--muted); margin-top: 18px; line-height: 1.7; text-align: center; }
+
+  /* accent colors */
+  .mod-color { color: var(--mod); }
+  .low-color { color: var(--low); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Meal Plan</h1>
+  <p>3,000 – 3,300 kcal · Cutting Phase</p>
+</header>
+
+<!-- TOP TABS -->
+<div class="top-tabs">
+  <button class="top-tab t-mod" onclick="showPlan('mod')">Moderate Carb</button>
+  <button class="top-tab" onclick="showPlan('low')">Lower Carb</button>
+</div>
+
+<!-- SUB TABS -->
+<div class="sub-tabs" id="sub-mod">
+  <button class="sub-tab s-active-mod" onclick="showSub('mod',1)">Option A</button>
+  <button class="sub-tab" onclick="showSub('mod',2)">Option B</button>
+</div>
+<div class="sub-tabs" id="sub-low" style="display:none">
+  <button class="sub-tab s-active-low" onclick="showSub('low',1)">Option A</button>
+  <button class="sub-tab" onclick="showSub('low',2)">Option B</button>
+</div>
+
+<!-- ========================================================
+     MODERATE CARB — OPTION A
+     ======================================================== -->
+<div class="section active" id="mod-1">
+
+  <!-- Grocery List -->
+  <div class="grocery-banner">
+    <h3>🛒 <span style="color:var(--mod)">Moderate Carb</span> — Shopping List</h3>
+    <div class="grocery-cols">
+      <div class="grocery-col">
+        <h4>Proteins</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Chicken breast</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Salmon fillets</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whole eggs</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Liquid egg whites</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whey protein powder</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Casein protein powder</div>
+        <div class="grocery-item"><div class="g-dot g-mod"></div>Canned tuna (in water)</div>
+        <div class="grocery-item"><div class="g-dot g-mod"></div>Greek yogurt (0% fat)</div>
+        <div class="grocery-item"><div class="g-dot g-mod"></div>Cottage cheese (low fat)</div>
+      </div>
+      <div class="grocery-col">
+        <h4>Carbs & Fats</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Rolled oats</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Basmati rice (white)</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Rice cakes</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Sweet potato</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Bananas</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Olive oil</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Peanut butter</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Avocado</div>
+        <h4 style="margin-top:10px">Veg</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen peas</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen corn</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Baby spinach</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Carrots</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="macro-bar">
+    <div class="macro-pill"><div class="val mod-color">254g</div><div class="lbl">Protein</div></div>
+    <div class="macro-pill"><div class="val mod-color">132g</div><div class="lbl">Fat</div></div>
+    <div class="macro-pill"><div class="val mod-color">297g</div><div class="lbl">Carbs</div></div>
+  </div>
+  <div class="cals-tag">~3,300 kcal · Option A · 30 / 35 / 35</div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#2a2500">🌅</div>
+        <div><div class="meal-title">Breakfast</div><div class="meal-sub">7:00 – 8:00 AM</div></div></div>
+      <div class="meal-cals mod-color">~700</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Whole eggs</div><div class="food-portion">3 large</div></div>
+        <div class="food-macros"><div class="fm">18g<span>PRO</span></div><div class="fm">15g<span>FAT</span></div><div class="fm">1g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Egg whites</div><div class="food-portion">150g liquid</div></div>
+        <div class="food-macros"><div class="fm">16g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">1g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Rolled oats</div><div class="food-portion">100g dry</div></div>
+        <div class="food-macros"><div class="fm">13g<span>PRO</span></div><div class="fm">7g<span>FAT</span></div><div class="fm">60g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Banana</div><div class="food-portion">1 medium (~120g)</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">27g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a2500">☀️</div>
+        <div><div class="meal-title">Mid-Morning Snack</div><div class="meal-sub">10:30 AM</div></div></div>
+      <div class="meal-cals mod-color">~400</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Greek yogurt (0% fat)</div><div class="food-portion">300g</div></div>
+        <div class="food-macros"><div class="fm">33g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">12g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Rice cakes</div><div class="food-portion">3 cakes (~30g)</div></div>
+        <div class="food-macros"><div class="fm">2g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">24g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Peanut butter</div><div class="food-portion">1 tbsp (16g)</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">8g<span>FAT</span></div><div class="fm">3g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#001a15">🍽️</div>
+        <div><div class="meal-title">Lunch</div><div class="meal-sub">1:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~800</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Chicken breast</div><div class="food-portion">250g cooked</div></div>
+        <div class="food-macros"><div class="fm">58g<span>PRO</span></div><div class="fm">6g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Basmati rice</div><div class="food-portion">100g dry</div></div>
+        <div class="food-macros"><div class="fm">7g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">78g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Frozen peas + corn</div><div class="food-portion">150g mixed, steamed</div></div>
+        <div class="food-macros"><div class="fm">6g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">22g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Olive oil (drizzle)</div><div class="food-portion">1 tbsp</div></div>
+        <div class="food-macros"><div class="fm">0g<span>PRO</span></div><div class="fm">14g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a1500">⚡</div>
+        <div><div class="meal-title">Pre-Workout</div><div class="meal-sub">4:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~400</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Whey protein shake</div><div class="food-portion">1 scoop in water</div></div>
+        <div class="food-macros"><div class="fm">25g<span>PRO</span></div><div class="fm">2g<span>FAT</span></div><div class="fm">3g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Rice cakes</div><div class="food-portion">3 cakes</div></div>
+        <div class="food-macros"><div class="fm">2g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">24g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Peanut butter</div><div class="food-portion">1.5 tbsp (24g)</div></div>
+        <div class="food-macros"><div class="fm">6g<span>PRO</span></div><div class="fm">12g<span>FAT</span></div><div class="fm">4g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1f1000">🐟</div>
+        <div><div class="meal-title">Dinner</div><div class="meal-sub">7:00 – 8:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~750</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Salmon fillet</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">40g<span>PRO</span></div><div class="fm">20g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Sweet potato (baked)</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">40g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed carrots</div><div class="food-portion">150g</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">11g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Baby spinach (wilted)</div><div class="food-portion">100g sautéed in oil</div></div>
+        <div class="food-macros"><div class="fm">3g<span>PRO</span></div><div class="fm">7g<span>FAT</span></div><div class="fm">2g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#0f0f1f">🌙</div>
+        <div><div class="meal-title">Night Snack</div><div class="meal-sub">10:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~250</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Cottage cheese (low fat)</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">24g<span>PRO</span></div><div class="fm">4g<span>FAT</span></div><div class="fm">5g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Casein protein shake</div><div class="food-portion">1 scoop in water</div></div>
+        <div class="food-macros"><div class="fm">24g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">4g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="totals-row">
+    <div class="t-label">Daily Total</div>
+    <div class="totals-nums">
+      <div class="tn"><div class="v mod-color">~257g</div><div class="l">PRO</div></div>
+      <div class="tn"><div class="v mod-color">~129g</div><div class="l">FAT</div></div>
+      <div class="tn"><div class="v mod-color">~291g</div><div class="l">CHO</div></div>
+      <div class="tn"><div class="v mod-color">~3,300</div><div class="l">kcal</div></div>
+    </div>
+  </div>
+  <div class="note">💊 Consider adding: Creatine (5g/day) · Vitamin D · Omega-3 (if not eating salmon daily) · Multivitamin<br>💧 Drink 3–4L water daily · Use a food scale for accuracy</div>
+</div>
+
+<!-- ========================================================
+     MODERATE CARB — OPTION B
+     ======================================================== -->
+<div class="section" id="mod-2">
+
+  <div class="grocery-banner">
+    <h3>🛒 <span style="color:var(--mod)">Moderate Carb</span> — Shopping List</h3>
+    <div class="grocery-cols">
+      <div class="grocery-col">
+        <h4>Proteins</h4>
+        <div class="grocery-item"><div class="g-dot g-mod"></div>Ground beef (93% lean)</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whole eggs</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Liquid egg whites</div>
+        <div class="grocery-item"><div class="g-dot g-mod"></div>Canned tuna (in water)</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Greek yogurt (0% fat)</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whey protein powder</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Casein protein powder</div>
+      </div>
+      <div class="grocery-col">
+        <h4>Carbs & Fats</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Rolled oats</div>
+        <div class="grocery-item"><div class="g-dot g-mod"></div>Whole-grain pasta</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Sweet potato</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Bananas</div>
+        <div class="grocery-item"><div class="g-dot g-mod"></div>Light tomato sauce</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Olive oil</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Avocado</div>
+        <h4 style="margin-top:10px">Veg</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen peas</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen corn</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Baby spinach</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Carrots</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="macro-bar">
+    <div class="macro-pill"><div class="val mod-color">254g</div><div class="lbl">Protein</div></div>
+    <div class="macro-pill"><div class="val mod-color">132g</div><div class="lbl">Fat</div></div>
+    <div class="macro-pill"><div class="val mod-color">297g</div><div class="lbl">Carbs</div></div>
+  </div>
+  <div class="cals-tag">~3,300 kcal · Option B · 30 / 35 / 35</div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#2a2500">🌅</div>
+        <div><div class="meal-title">Breakfast</div><div class="meal-sub">7:00 – 8:00 AM</div></div></div>
+      <div class="meal-cals mod-color">~680</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Whole eggs + egg whites omelette</div><div class="food-portion">2 whole + 200g whites</div></div>
+        <div class="food-macros"><div class="fm">35g<span>PRO</span></div><div class="fm">10g<span>FAT</span></div><div class="fm">2g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Baby spinach (wilted in omelette)</div><div class="food-portion">80g</div></div>
+        <div class="food-macros"><div class="fm">2g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">1g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Rolled oats</div><div class="food-portion">100g dry</div></div>
+        <div class="food-macros"><div class="fm">13g<span>PRO</span></div><div class="fm">7g<span>FAT</span></div><div class="fm">60g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Banana</div><div class="food-portion">1 medium</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">27g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a2500">☀️</div>
+        <div><div class="meal-title">Mid-Morning Snack</div><div class="meal-sub">10:30 AM</div></div></div>
+      <div class="meal-cals mod-color">~380</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Whey protein shake</div><div class="food-portion">1 scoop in milk (250ml low-fat)</div></div>
+        <div class="food-macros"><div class="fm">33g<span>PRO</span></div><div class="fm">5g<span>FAT</span></div><div class="fm">15g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Avocado on 1 rice cake</div><div class="food-portion">½ avocado + 1 cake</div></div>
+        <div class="food-macros"><div class="fm">2g<span>PRO</span></div><div class="fm">11g<span>FAT</span></div><div class="fm">12g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#001a15">🍽️</div>
+        <div><div class="meal-title">Lunch</div><div class="meal-sub">1:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~850</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Ground beef (93% lean)</div><div class="food-portion">250g cooked</div></div>
+        <div class="food-macros"><div class="fm">58g<span>PRO</span></div><div class="fm">18g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Whole-grain pasta</div><div class="food-portion">100g dry</div></div>
+        <div class="food-macros"><div class="fm">14g<span>PRO</span></div><div class="fm">2g<span>FAT</span></div><div class="fm">72g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Light tomato sauce</div><div class="food-portion">150ml</div></div>
+        <div class="food-macros"><div class="fm">2g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">10g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Frozen peas + corn (stirred in)</div><div class="food-portion">100g mixed</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">15g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a1500">⚡</div>
+        <div><div class="meal-title">Pre-Workout</div><div class="meal-sub">4:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~350</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Canned tuna</div><div class="food-portion">1 can (~160g drained)</div></div>
+        <div class="food-macros"><div class="fm">38g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Rice cakes</div><div class="food-portion">4 cakes</div></div>
+        <div class="food-macros"><div class="fm">3g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">32g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1f1000">🍽️</div>
+        <div><div class="meal-title">Dinner</div><div class="meal-sub">7:00 – 8:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~800</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Salmon fillet</div><div class="food-portion">220g</div></div>
+        <div class="food-macros"><div class="fm">44g<span>PRO</span></div><div class="fm">22g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Sweet potato (baked)</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">40g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed carrots</div><div class="food-portion">150g</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">11g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#0f0f1f">🌙</div>
+        <div><div class="meal-title">Night Snack</div><div class="meal-sub">10:00 PM</div></div></div>
+      <div class="meal-cals mod-color">~240</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Greek yogurt (0% fat)</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">22g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">8g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Casein protein shake</div><div class="food-portion">1 scoop in water</div></div>
+        <div class="food-macros"><div class="fm">24g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">4g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="totals-row">
+    <div class="t-label">Daily Total</div>
+    <div class="totals-nums">
+      <div class="tn"><div class="v mod-color">~255g</div><div class="l">PRO</div></div>
+      <div class="tn"><div class="v mod-color">~131g</div><div class="l">FAT</div></div>
+      <div class="tn"><div class="v mod-color">~309g</div><div class="l">CHO</div></div>
+      <div class="tn"><div class="v mod-color">~3,320</div><div class="l">kcal</div></div>
+    </div>
+  </div>
+  <div class="note">💊 Consider adding: Creatine (5g/day) · Vitamin D · Omega-3 · Multivitamin<br>💧 Drink 3–4L water daily · Use a food scale for accuracy</div>
+</div>
+
+<!-- ========================================================
+     LOWER CARB — OPTION A
+     ======================================================== -->
+<div class="section" id="low-1">
+
+  <div class="grocery-banner">
+    <h3>🛒 <span style="color:var(--low)">Lower Carb</span> — Shopping List</h3>
+    <div class="grocery-cols">
+      <div class="grocery-col">
+        <h4>Proteins</h4>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Ground beef (93% lean)</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Steak (sirloin/rump)</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whole eggs</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Liquid egg whites</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Turkey breast slices</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whey protein powder</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Casein protein powder</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Cottage cheese (low fat)</div>
+      </div>
+      <div class="grocery-col">
+        <h4>Carbs & Fats</h4>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Brown rice</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Bananas</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Olive oil</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Butter</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Almonds / walnuts</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Cheddar / parmesan cheese</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Avocado</div>
+        <h4 style="margin-top:10px">Veg</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen peas</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen corn</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Baby spinach</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Carrots</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="macro-bar">
+    <div class="macro-pill"><div class="val low-color">339g</div><div class="lbl">Protein</div></div>
+    <div class="macro-pill"><div class="val low-color">151g</div><div class="lbl">Fat</div></div>
+    <div class="macro-pill"><div class="val low-color">170g</div><div class="lbl">Carbs</div></div>
+  </div>
+  <div class="cals-tag">~3,300 kcal · Option A · 40 / 40 / 20</div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#002520">🌅</div>
+        <div><div class="meal-title">Breakfast</div><div class="meal-sub">7:00 – 8:00 AM</div></div></div>
+      <div class="meal-cals low-color">~650</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Whole eggs</div><div class="food-portion">3 large</div></div>
+        <div class="food-macros"><div class="fm">18g<span>PRO</span></div><div class="fm">15g<span>FAT</span></div><div class="fm">1g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Egg whites</div><div class="food-portion">200g liquid</div></div>
+        <div class="food-macros"><div class="fm">22g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">1g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Turkey breast slices</div><div class="food-portion">100g</div></div>
+        <div class="food-macros"><div class="fm">22g<span>PRO</span></div><div class="fm">2g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Avocado</div><div class="food-portion">½ medium</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">11g<span>FAT</span></div><div class="fm">4g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Baby spinach (sautéed)</div><div class="food-portion">100g</div></div>
+        <div class="food-macros"><div class="fm">3g<span>PRO</span></div><div class="fm">4g<span>FAT</span></div><div class="fm">2g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a1500">☀️</div>
+        <div><div class="meal-title">Mid-Morning</div><div class="meal-sub">10:30 AM</div></div></div>
+      <div class="meal-cals low-color">~350</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Whey protein shake</div><div class="food-portion">1.5 scoops in water</div></div>
+        <div class="food-macros"><div class="fm">37g<span>PRO</span></div><div class="fm">3g<span>FAT</span></div><div class="fm">5g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Almonds</div><div class="food-portion">30g</div></div>
+        <div class="food-macros"><div class="fm">6g<span>PRO</span></div><div class="fm">16g<span>FAT</span></div><div class="fm">4g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#001a15">🍽️</div>
+        <div><div class="meal-title">Lunch</div><div class="meal-sub">1:00 PM</div></div></div>
+      <div class="meal-cals low-color">~800</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Ground beef (93% lean)</div><div class="food-portion">250g cooked</div></div>
+        <div class="food-macros"><div class="fm">58g<span>PRO</span></div><div class="fm">18g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Brown rice</div><div class="food-portion">60g dry</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">44g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed peas + corn</div><div class="food-portion">100g mixed</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">15g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Olive oil (drizzle)</div><div class="food-portion">1 tbsp</div></div>
+        <div class="food-macros"><div class="fm">0g<span>PRO</span></div><div class="fm">14g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a1000">⚡</div>
+        <div><div class="meal-title">Pre-Workout</div><div class="meal-sub">4:00 PM</div></div></div>
+      <div class="meal-cals low-color">~350</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Cottage cheese</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">24g<span>PRO</span></div><div class="fm">4g<span>FAT</span></div><div class="fm">5g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Banana</div><div class="food-portion">1 medium (pre-workout carbs)</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">27g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a0500">🥩</div>
+        <div><div class="meal-title">Dinner</div><div class="meal-sub">7:00 – 8:00 PM</div></div></div>
+      <div class="meal-cals low-color">~850</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Steak (sirloin/rump)</div><div class="food-portion">300g</div></div>
+        <div class="food-macros"><div class="fm">66g<span>PRO</span></div><div class="fm">18g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed carrots</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">2g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">15g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed peas</div><div class="food-portion">100g</div></div>
+        <div class="food-macros"><div class="fm">5g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">11g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Butter (cooking)</div><div class="food-portion">1 tbsp</div></div>
+        <div class="food-macros"><div class="fm">0g<span>PRO</span></div><div class="fm">12g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Cheddar cheese (grated)</div><div class="food-portion">30g</div></div>
+        <div class="food-macros"><div class="fm">8g<span>PRO</span></div><div class="fm">10g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#0f0f1f">🌙</div>
+        <div><div class="meal-title">Night Snack</div><div class="meal-sub">10:00 PM</div></div></div>
+      <div class="meal-cals low-color">~350</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Casein protein shake</div><div class="food-portion">1.5 scoops in water</div></div>
+        <div class="food-macros"><div class="fm">36g<span>PRO</span></div><div class="fm">2g<span>FAT</span></div><div class="fm">6g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Walnuts</div><div class="food-portion">30g</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">18g<span>FAT</span></div><div class="fm">4g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="totals-row">
+    <div class="t-label">Daily Total</div>
+    <div class="totals-nums">
+      <div class="tn"><div class="v low-color">~340g</div><div class="l">PRO</div></div>
+      <div class="tn"><div class="v low-color">~150g</div><div class="l">FAT</div></div>
+      <div class="tn"><div class="v low-color">~162g</div><div class="l">CHO</div></div>
+      <div class="tn"><div class="v low-color">~3,290</div><div class="l">kcal</div></div>
+    </div>
+  </div>
+  <div class="note">💊 Must add: Creatine (5g/day) · Vitamin D · Omega-3 fish oil (essential on low-carb) · Electrolytes (sodium/potassium/magnesium)<br>💧 Drink 3–4L water daily · Use a food scale for accuracy</div>
+</div>
+
+<!-- ========================================================
+     LOWER CARB — OPTION B
+     ======================================================== -->
+<div class="section" id="low-2">
+
+  <div class="grocery-banner">
+    <h3>🛒 <span style="color:var(--low)">Lower Carb</span> — Shopping List</h3>
+    <div class="grocery-cols">
+      <div class="grocery-col">
+        <h4>Proteins</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Chicken breast</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Salmon fillet</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whole eggs</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Liquid egg whites</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Canned tuna (in water)</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Whey protein powder</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Casein protein powder</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Greek yogurt (0% fat)</div>
+      </div>
+      <div class="grocery-col">
+        <h4>Carbs & Fats</h4>
+        <div class="grocery-item"><div class="g-dot g-low"></div>White rice (small bag)</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Bananas</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Olive oil</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Avocado</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Mozzarella (low fat)</div>
+        <div class="grocery-item"><div class="g-dot g-low"></div>Almonds</div>
+        <h4 style="margin-top:10px">Veg</h4>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen peas</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Frozen corn</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Baby spinach</div>
+        <div class="grocery-item"><div class="g-dot g-both"></div>Carrots</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="macro-bar">
+    <div class="macro-pill"><div class="val low-color">339g</div><div class="lbl">Protein</div></div>
+    <div class="macro-pill"><div class="val low-color">151g</div><div class="lbl">Fat</div></div>
+    <div class="macro-pill"><div class="val low-color">170g</div><div class="lbl">Carbs</div></div>
+  </div>
+  <div class="cals-tag">~3,300 kcal · Option B · 40 / 40 / 20</div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#002520">🌅</div>
+        <div><div class="meal-title">Breakfast</div><div class="meal-sub">7:00 – 8:00 AM</div></div></div>
+      <div class="meal-cals low-color">~620</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Scrambled eggs + whites</div><div class="food-portion">3 whole + 150g whites</div></div>
+        <div class="food-macros"><div class="fm">34g<span>PRO</span></div><div class="fm">15g<span>FAT</span></div><div class="fm">1g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Low-fat mozzarella</div><div class="food-portion">80g</div></div>
+        <div class="food-macros"><div class="fm">18g<span>PRO</span></div><div class="fm">8g<span>FAT</span></div><div class="fm">1g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Baby spinach (wilted)</div><div class="food-portion">100g</div></div>
+        <div class="food-macros"><div class="fm">3g<span>PRO</span></div><div class="fm">4g<span>FAT</span></div><div class="fm">2g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Banana</div><div class="food-portion">1 small (~100g)</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">23g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a1500">☀️</div>
+        <div><div class="meal-title">Mid-Morning</div><div class="meal-sub">10:30 AM</div></div></div>
+      <div class="meal-cals low-color">~380</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Whey protein shake</div><div class="food-portion">1.5 scoops in water</div></div>
+        <div class="food-macros"><div class="fm">37g<span>PRO</span></div><div class="fm">3g<span>FAT</span></div><div class="fm">5g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Canned tuna</div><div class="food-portion">1 small can (~80g drained)</div></div>
+        <div class="food-macros"><div class="fm">19g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Almonds</div><div class="food-portion">25g</div></div>
+        <div class="food-macros"><div class="fm">5g<span>PRO</span></div><div class="fm">14g<span>FAT</span></div><div class="fm">3g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#001a15">🍽️</div>
+        <div><div class="meal-title">Lunch</div><div class="meal-sub">1:00 PM</div></div></div>
+      <div class="meal-cals low-color">~800</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Chicken breast</div><div class="food-portion">300g cooked</div></div>
+        <div class="food-macros"><div class="fm">70g<span>PRO</span></div><div class="fm">7g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">White rice</div><div class="food-portion">60g dry</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">47g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed peas + corn</div><div class="food-portion">120g mixed</div></div>
+        <div class="food-macros"><div class="fm">5g<span>PRO</span></div><div class="fm">1g<span>FAT</span></div><div class="fm">18g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Avocado</div><div class="food-portion">½ medium</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">11g<span>FAT</span></div><div class="fm">4g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#1a1000">⚡</div>
+        <div><div class="meal-title">Pre-Workout</div><div class="meal-sub">4:00 PM</div></div></div>
+      <div class="meal-cals low-color">~320</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Greek yogurt (0% fat)</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">22g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">8g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Banana (small)</div><div class="food-portion">1 small ~100g</div></div>
+        <div class="food-macros"><div class="fm">1g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">23g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#001a10">🐟</div>
+        <div><div class="meal-title">Dinner</div><div class="meal-sub">7:00 – 8:00 PM</div></div></div>
+      <div class="meal-cals low-color">~900</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Salmon fillet</div><div class="food-portion">250g</div></div>
+        <div class="food-macros"><div class="fm">50g<span>PRO</span></div><div class="fm">25g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed carrots</div><div class="food-portion">200g</div></div>
+        <div class="food-macros"><div class="fm">2g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">15g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Steamed peas</div><div class="food-portion">100g</div></div>
+        <div class="food-macros"><div class="fm">5g<span>PRO</span></div><div class="fm">0g<span>FAT</span></div><div class="fm">11g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Olive oil (cooking)</div><div class="food-portion">1.5 tbsp</div></div>
+        <div class="food-macros"><div class="fm">0g<span>PRO</span></div><div class="fm">20g<span>FAT</span></div><div class="fm">0g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="meal">
+    <div class="meal-header">
+      <div class="meal-header-left"><div class="meal-icon" style="background:#0f0f1f">🌙</div>
+        <div><div class="meal-title">Night Snack</div><div class="meal-sub">10:00 PM</div></div></div>
+      <div class="meal-cals low-color">~300</div>
+    </div>
+    <div class="meal-body">
+      <div class="food-item"><div><div class="food-name">Casein protein shake</div><div class="food-portion">1.5 scoops in water</div></div>
+        <div class="food-macros"><div class="fm">36g<span>PRO</span></div><div class="fm">2g<span>FAT</span></div><div class="fm">6g<span>CHO</span></div></div></div>
+      <div class="food-item"><div><div class="food-name">Almonds</div><div class="food-portion">20g</div></div>
+        <div class="food-macros"><div class="fm">4g<span>PRO</span></div><div class="fm">11g<span>FAT</span></div><div class="fm">3g<span>CHO</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="totals-row">
+    <div class="t-label">Daily Total</div>
+    <div class="totals-nums">
+      <div class="tn"><div class="v low-color">~337g</div><div class="l">PRO</div></div>
+      <div class="tn"><div class="v low-color">~152g</div><div class="l">FAT</div></div>
+      <div class="tn"><div class="v low-color">~170g</div><div class="l">CHO</div></div>
+      <div class="tn"><div class="v low-color">~3,300</div><div class="l">kcal</div></div>
+    </div>
+  </div>
+  <div class="note">💊 Must add: Creatine (5g/day) · Vitamin D · Omega-3 fish oil · Electrolytes (sodium/potassium/magnesium)<br>💧 Drink 3–4L water daily · Use a food scale for accuracy</div>
+</div>
+
+<script>
+  let currentPlan = 'mod';
+
+  function showPlan(plan) {
+    currentPlan = plan;
+    // top tabs
+    document.querySelectorAll('.top-tab').forEach((b,i) => {
+      b.className = 'top-tab';
+      if (i === 0 && plan === 'mod') b.classList.add('t-mod');
+      if (i === 1 && plan === 'low') b.classList.add('t-low');
+    });
+    // sub tabs
+    document.getElementById('sub-mod').style.display = plan === 'mod' ? 'flex' : 'none';
+    document.getElementById('sub-low').style.display = plan === 'low' ? 'flex' : 'none';
+    // show first option of chosen plan
+    showSub(plan, 1);
+  }
+
+  function showSub(plan, num) {
+    // hide all sections
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(plan + '-' + num).classList.add('active');
+    // update sub tabs
+    const subEl = document.getElementById('sub-' + plan);
+    subEl.querySelectorAll('.sub-tab').forEach((b, i) => {
+      b.className = 'sub-tab';
+      if (i + 1 === num) b.classList.add(plan === 'mod' ? 's-active-mod' : 's-active-low');
+    });
+  }
+</script>
+</body>
+</html>
